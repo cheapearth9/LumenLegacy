@@ -1,0 +1,58 @@
+name: LumenLegacy
+options:
+  bundleIdPrefix: com.lumen
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "12.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  LumenLegacy:
+    type: application
+    platform: iOS
+    sources:
+      - Client
+      - Shared
+    info:
+      path: Client/Info.plist
+      properties:
+        CFBundleDisplayName: Lumen Legacy
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchStoryboardName: LaunchScreen
+        UIRequiresFullScreen: true
+        UIApplicationSupportsIndirectInputEvents: true
+        # arm64 only: every device that can run iOS 12 (iPhone 5s and newer, iPad Air and newer) is arm64.
+        UIRequiredDeviceCapabilities:
+          - arm64
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSLocalNetworkUsageDescription: Lumen finds and connects to your computer on the local network.
+        NSBonjourServices:
+          - _lumen._udp
+        # No UIApplicationSceneManifest on purpose: the legacy app uses the classic AppDelegate window (and UIScreen
+        # notifications for external displays) on every iOS version.
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lumen.legacy
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        PRODUCT_NAME: LumenLegacy
+        TARGETED_DEVICE_FAMILY: "1,2"
+        IPHONEOS_DEPLOYMENT_TARGET: "12.0"
+        SUPPORTS_MACCATALYST: NO
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_BITCODE: NO
+        # The iOS 12 SDK era APIs we use are deprecated in newer SDKs (controllerPausedHandler, ...): warnings only.
+        SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+        GCC_TREAT_WARNINGS_AS_ERRORS: NO
