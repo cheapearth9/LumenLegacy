@@ -116,7 +116,7 @@ final class AESGCM {
 
     private static func reduce1Bit(_ hi: UInt64, _ lo: UInt64) -> (UInt64, UInt64) {
         let t: UInt64 = (lo & 1) != 0 ? 0xE100_0000_0000_0000 : 0
-        return (hi >> 1) ^ t, (hi << 63) | (lo >> 1)
+        return ((hi >> 1) ^ t, (hi << 63) | (lo >> 1))
     }
 
     private static func be64(_ b: [UInt8], _ off: Int) -> UInt64 {
