@@ -51,6 +51,15 @@ enum SampleFactory {
         defer { ptrs.forEach { $0.deallocate() } }
         let sizes = sets.map { $0.count }
         var fd: CMVideoFormatDescription?
+        if sets.count == 2 {   // SPS + PPS: the host is sending H.264
+            let st264 = CMVideoFormatDescriptionCreateFromH264ParameterSets(allocator: nil,
+                                                                            parameterSetCount: 2,
+                                                                            parameterSetPointers: ptrs,
+                                                                            parameterSetSizes: sizes,
+                                                                            nalUnitHeaderLength: 4,
+                                                                            formatDescriptionOut: &fd)
+            return st264 == noErr ? fd : nil
+        }
         let st = CMVideoFormatDescriptionCreateFromHEVCParameterSets(allocator: nil,
                                                                     parameterSetCount: sets.count,
                                                                     parameterSetPointers: ptrs,

@@ -174,6 +174,7 @@ final class Reassembler {
 struct HelloInfo: Equatable {
     static let flagAudio: UInt8 = 1      // client wants audio
     static let flagExtend: UInt8 = 2     // client wants an extended desktop (virtual display) instead of a mirror
+    static let flagH264: UInt8 = 4       // no hardware HEVC decoder here (A7/A8 chips): host sends H.264 instead
 
     var width: UInt16
     var height: UInt16
@@ -183,6 +184,7 @@ struct HelloInfo: Equatable {
 
     var wantsAudio: Bool { flags & HelloInfo.flagAudio != 0 }
     var wantsExtend: Bool { flags & HelloInfo.flagExtend != 0 }
+    var wantsH264: Bool { flags & HelloInfo.flagH264 != 0 }
 
     func encode() -> Data {
         var w = ByteWriter()

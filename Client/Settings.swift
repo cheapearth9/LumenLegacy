@@ -1,4 +1,5 @@
 import UIKit
+import VideoToolbox
 
 /// User preferences (UserDefaults, same keys as the main Lumen app).
 enum LumenSettings {
@@ -65,6 +66,8 @@ enum LumenSettings {
         var f: UInt8 = 0
         if audioOn { f |= HelloInfo.flagAudio }
         if extend { f |= HelloInfo.flagExtend }
+        // Automatic: H.264 only when this chip cannot decode HEVC in hardware.
+        if !VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC) { f |= HelloInfo.flagH264 }
         return f
     }
 
