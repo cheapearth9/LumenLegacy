@@ -13,13 +13,13 @@ enum LegacyKeyCommands {
         m["\r"] = 40; m["\t"] = 43; m[" "] = 44; m["\u{8}"] = 42
         m["-"] = 45; m["="] = 46; m["["] = 47; m["]"] = 48; m["\\"] = 49
         m[";"] = 51; m["'"] = 52; m["`"] = 53; m[","] = 54; m["."] = 55; m["/"] = 56
-        m[UIKeyInputEscape] = 41
-        m[UIKeyInputRightArrow] = 79
-        m[UIKeyInputLeftArrow] = 80
-        m[UIKeyInputDownArrow] = 81
-        m[UIKeyInputUpArrow] = 82
-        m[UIKeyInputPageUp] = 75
-        m[UIKeyInputPageDown] = 78
+        m[UIKeyCommand.inputEscape] = 41
+        m[UIKeyCommand.inputRightArrow] = 79
+        m[UIKeyCommand.inputLeftArrow] = 80
+        m[UIKeyCommand.inputDownArrow] = 81
+        m[UIKeyCommand.inputUpArrow] = 82
+        m[UIKeyCommand.inputPageUp] = 75
+        m[UIKeyCommand.inputPageDown] = 78
         return m
     }()
 
