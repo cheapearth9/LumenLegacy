@@ -37,15 +37,10 @@ enum PairingPrompt {
             }
             return
         }
-        let alert = UIAlertController(title: "Pair with \(host)", message: nil, preferredStyle: .alert)
-        let textColor: UIColor
-        if #available(iOS 13.0, *) { textColor = UIColor.label } else { textColor = UIColor.black }
-        let text = NSMutableAttributedString(string: "On \(host), type this code when asked:\n\n",
-                                             attributes: [.font: UIFont.systemFont(ofSize: 13), .foregroundColor: textColor])
-        text.append(NSAttributedString(string: code,
-                                       attributes: [.font: UIFont.monospacedDigitSystemFont(ofSize: 44, weight: .bold),
-                                                    .foregroundColor: textColor]))
-        alert.setValue(text, forKey: "attributedMessage")
+        // Plain title/message only: no private KVC keys (setValue forKey: "attributedMessage" can raise an exception).
+        let spaced = code.map { String($0) }.joined(separator: " ")
+        let alert = UIAlertController(title: "Pair with \(host)",
+                                      message: "On \(host), type this code when asked:\n\n\(spaced)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
             current = nil
             wanted = false
