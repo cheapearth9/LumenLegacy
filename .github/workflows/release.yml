@@ -105,6 +105,26 @@ jobs:
           [ "$v" = "$LUMEN_VERSION" ] || { echo "version mismatch ($v vs $LUMEN_VERSION)"; exit 1; }
           [ "$min" = "12.0" ] || { echo "unexpected MinimumOSVersion $min"; exit 1; }
 
+      - name: Fake-sign with ldid (jailbreak installers such as Filza/AppSync need an application-identifier entitlement)
+        run: |
+          brew install ldid
+          APP=$(find build/ios/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -n 1)
+          EXE=$(/usr/libexec/PlistBuddy -c 'Print CFBundleExecutable' "$APP/Info.plist")
+          cat > build/ent.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>application-identifier</key><string>LUMENLEGACY.com.lumen.legacy</string>
+            <key>com.apple.developer.team-identifier</key><string>LUMENLEGACY</string>
+            <key>get-task-allow</key><true/>
+            <key>keychain-access-groups</key><array><string>LUMENLEGACY.com.lumen.legacy</string></array>
+          </dict></plist>
+          PLIST
+          sed -i '' 's/^          //' build/ent.plist
+          find "$APP" -name '*.dylib' -exec ldid -S {} \;
+          ldid -Sbuild/ent.plist "$APP/$EXE"
+          ldid -e "$APP/$EXE" | head -20
+
       - name: Package .ipa
         run: |
           APP=$(find build/ios/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' | head -n 1)

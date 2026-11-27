@@ -12,6 +12,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        CrashReporter.install()
+        Crumb.add("launch")
         let w = UIWindow(frame: UIScreen.main.bounds)
         w.rootViewController = RootViewController(client: client)
         w.makeKeyAndVisible()
@@ -29,6 +31,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
             DispatchQueue.main.async { w.rootViewController?.present(alert, animated: true, completion: nil) }
         }
         client.start()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { CrashReporter.offerPreviousReport(from: w.rootViewController) }
         return true
     }
 

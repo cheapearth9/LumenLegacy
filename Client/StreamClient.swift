@@ -343,6 +343,7 @@ final class StreamClient {
     // MARK: Session lifecycle (queue)
 
     private func begin(_ c: NWConnection, cable: Bool, hello: HelloInfo, target: Target) {
+        Crumb.add("begin \(cable ? "cable" : "udp") \(target.key)")
         teardown(notify: false)
         epoch += 1
         var hello = hello
@@ -381,6 +382,7 @@ final class StreamClient {
             switch st {
             case .ready:
                 self.connReady = true
+                Crumb.add("connection ready")
                 if cable { self.receiveStream(c) } else { self.receiveDatagram(c) }
                 self.beginHandshake()
             case .failed(let e):
@@ -444,6 +446,7 @@ final class StreamClient {
 
     /// Enters pairing mode: no sealed session, the host shows nothing; we send step 1 once the connection is ready.
     private func startPairing() {
+        Crumb.add("start pairing")
         pairingActive = true
         pairingKey = nil
         session = nil
@@ -494,6 +497,7 @@ final class StreamClient {
         switch step {
         case 2:
             guard pairStep3 == nil, let s3 = p.handleStep2(payload), let code = p.code else { return }
+            Crumb.add("pairing step 2, showing code")
             pairStep3 = s3
             pairStep3At = Date()
             pairStep3SentAt = Date()
@@ -556,6 +560,7 @@ final class StreamClient {
     private func handleHandshake(_ payload: Data) {
         guard let s = session, !handshakeDone, !s.isReady else { return }
         if s.finish(serverReply: payload) {
+            Crumb.add("handshake done")
             handshakeDone = true
             replyAt = Date()
             lastRx = Date()
@@ -723,6 +728,7 @@ final class StreamClient {
         switch h.type {
         case .welcome:
             guard let w = WelcomeInfo.decode(payload), !gotWelcome else { return }
+            Crumb.add("welcome \(w.width)x\(w.height)")
             gotWelcome = true
             gotFirstFrame = false
             welcomeAt = Date()
@@ -789,7 +795,8 @@ final class StreamClient {
                 sets.append(s)
             }
             if sets != lastSets || formatDesc == nil {
-                guard let fd = SampleFactory.formatDescription(parameterSets: sets) else { return }
+                Crumb.add("video format, \(sets.count) parameter sets")
+                guard let fd = SampleFactory.formatDescription(parameterSets: sets) else { Crumb.add("format description failed"); return }
                 formatDesc = fd
                 lastSets = sets
             }
@@ -798,6 +805,7 @@ final class StreamClient {
 
         if needKey { requestKeyframe(); return }
         guard let fd = formatDesc, let sb = SampleFactory.sampleBuffer(avcc: r.rest(), format: fd) else { return }
+        if !gotFirstFrame { Crumb.add("first frame") }
         gotFirstFrame = true
         statFrames += 1
         statBytes += f.data.count
