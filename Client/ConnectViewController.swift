@@ -95,14 +95,24 @@ final class ConnectViewController: UITableViewController {
 
     @objc private func externalChanged() { /* resolution text depends on the attached monitor; nothing to redraw */ }
 
+    /// Reloading one section whose row count changed raises NSInternalInconsistencyException on newer iOS
+    /// (e.g. the "Connecting" row appearing); a full reload is always safe in that case.
+    private func refresh(section i: Int) {
+        if tableView.numberOfRows(inSection: i) == self.tableView(tableView, numberOfRowsInSection: i) {
+            tableView.reloadSections(IndexSet(integer: i), with: .none)
+        } else {
+            tableView.reloadData()
+        }
+    }
+
     @objc private func clientChanged(_ n: Notification) {
         guard let field = n.userInfo?["field"] as? String else { return }
         switch field {
         case "hosts":
-            if let i = sections.firstIndex(of: .hosts) { tableView.reloadSections(IndexSet(integer: i), with: .none) }
+            if let i = sections.firstIndex(of: .hosts) { refresh(section: i) }
         case "state", "cablePaused":
             for s in [Section.cable, Section.status] {
-                if let i = sections.firstIndex(of: s) { tableView.reloadSections(IndexSet(integer: i), with: .none) }
+                if let i = sections.firstIndex(of: s) { refresh(section: i) }
             }
         default:
             break
