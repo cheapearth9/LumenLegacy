@@ -34,7 +34,8 @@ jobs:
             v="1.0"
           else
             set -- $best; maj=$1; min=$2; pat=${3:-0}
-            if echo "$MSG" | grep -qi '\[major\]'; then
+            # Bug fixes bump the 3rd number; after .9 (2.0.9) the next release is a major one (2.1), then 2.1.1, 2.1.2 ...
+            if echo "$MSG" | grep -qi '\[major\]' || [ "$pat" -ge 9 ]; then
               if [ "$min" -ge 9 ]; then v="$((maj + 1)).0"; else v="$maj.$((min + 1))"; fi
             else
               v="$maj.$min.$((pat + 1))"
