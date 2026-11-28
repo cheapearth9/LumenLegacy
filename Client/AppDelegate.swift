@@ -35,6 +35,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        var task = UIBackgroundTaskIdentifier.invalid
+        task = application.beginBackgroundTask { application.endBackgroundTask(task) }
+        client.disconnectForBackground()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { application.endBackgroundTask(task) }
+    }
+
     func applicationDidBecomeActive(_ application: UIApplication) {
         // The cable listener can be torn down while backgrounded; re-arm it.
         client.start()

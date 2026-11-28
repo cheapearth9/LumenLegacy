@@ -283,6 +283,15 @@ final class StreamClient {
         begin(NWConnection(to: endpoint, using: params), cable: false, hello: hello, target: target)
     }
 
+    /// The app left the foreground: end the session so the computer goes back to its normal displays.
+    func disconnectForBackground() {
+        queue.async {
+            guard self.handshakeDone else { return }
+            self.send(.bye)
+            self.teardown(notify: true)
+        }
+    }
+
     func disconnect() {
         queue.async {
             self.send(.bye)
