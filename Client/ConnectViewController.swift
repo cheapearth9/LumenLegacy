@@ -98,11 +98,8 @@ final class ConnectViewController: UITableViewController {
     /// Reloading one section whose row count changed raises NSInternalInconsistencyException on newer iOS
     /// (e.g. the "Connecting" row appearing); a full reload is always safe in that case.
     private func refresh(section i: Int) {
-        if tableView.numberOfRows(inSection: i) == self.tableView(tableView, numberOfRowsInSection: i) {
-            tableView.reloadSections(IndexSet(integer: i), with: .none)
-        } else {
-            tableView.reloadData()
-        }
+        // numberOfRows(inSection:) can already report the new count, so the old/new comparison cannot be trusted: always reload fully.
+        tableView.reloadData()
     }
 
     @objc private func clientChanged(_ n: Notification) {
